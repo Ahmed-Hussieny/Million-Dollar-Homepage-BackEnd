@@ -35,6 +35,11 @@ const logoSchema = new Schema({
         type: String,
         required: true
     },
+    //* is verified
+    isVerified:{
+        type: Boolean,
+        default: false
+    }
 },{
     timestamps: true
 });
