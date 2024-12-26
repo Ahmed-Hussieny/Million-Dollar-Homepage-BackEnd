@@ -1,25 +1,28 @@
-import { Router } from "express"
+import { Router } from "express";
 import * as logoController from "./logo.controller.js";
 import { multerMiddlewareLocal } from "../../middlewares/multer.js";
 import { allowedExtension } from "../../utils/allowedExtension.js";
-import crypto from "crypto";
+import { auth } from "../../middlewares/auth.middleware.js";
+import { logoEndPointsRoles } from "./logo.endPoints.roles.js";
 const logoRouter = Router();
-logoRouter.post("/addLogo",multerMiddlewareLocal({extensions:allowedExtension.image}).single('image'), logoController.addLogo);
+
+logoRouter.post(
+  "/addLogo",
+  multerMiddlewareLocal({ extensions: allowedExtension.image }).single("image"),
+  logoController.addLogo
+);
+logoRouter.post(
+  "/addUnpaidLogo",
+  multerMiddlewareLocal({ extensions: allowedExtension.image }).single("image"),
+  logoController.addUnpaidLogo
+);
+logoRouter.put(
+  "/updateLogo/:id",
+  auth(logoEndPointsRoles.UPDATE_LOGO),
+  multerMiddlewareLocal({ extensions: allowedExtension.image }).single("image"),
+  logoController.updateLogo
+);
 logoRouter.get("/getLogos", logoController.getLogos);
-
-
-const verifyWebhookSignature = (req) => {
-    const signature = req.headers["x-tap-signature"];
-    const body = JSON.stringify(req.body);
-    const secretKey = process.env.TAP_SECRET_KEY;
-    const generatedSignature = crypto
-      .createHmac("sha256", secretKey)
-      .update(body)
-      .digest("hex");
-  
-    return signature === generatedSignature;
-  };
-
 logoRouter.post("/webhook", logoController.verifyPayment);
-logoRouter.post("/tap-webhook", logoController.test);
+logoRouter.delete("/deleteLogo/:id",auth(logoEndPointsRoles.DELETE_LOGO), logoController.deleteLogo);
 export default logoRouter;

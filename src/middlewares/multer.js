@@ -17,7 +17,7 @@ export const multerMiddlewareLocal = ({
         },
         filename : (req, file, cb)=>{
             //^ cb(error, filename)
-            cb(null, file.originalname);
+            cb(null,  Date.now()+ '-' +file.originalname);
         },
     });
     const fileFilter = (req, file, cb)=>{
