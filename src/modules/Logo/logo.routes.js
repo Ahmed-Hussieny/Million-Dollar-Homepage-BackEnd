@@ -13,6 +13,7 @@ logoRouter.post(
 );
 logoRouter.post(
   "/addUnpaidLogo",
+  auth(logoEndPointsRoles.ADD_LOGO),
   multerMiddlewareLocal({ extensions: allowedExtension.image }).single("image"),
   logoController.addUnpaidLogo
 );

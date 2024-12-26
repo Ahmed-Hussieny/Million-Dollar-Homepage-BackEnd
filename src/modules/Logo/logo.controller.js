@@ -13,19 +13,20 @@ export const addLogo = async (req, res, next) => {
   if (!logos) {
     return res.status(400).json({ message: "Failed to fetch logos" });
   }
-  // for (let i = 0; i < logos.length; i++) {
-  //   const logo = logos[i];
-  //   for (let j = 0; j < logo.pixels.length; j++) {
-  //     const pixel = logo.pixels[j];
-  //     for (let k = 0; k < pixels.length; k++) {
-  //       const newPixel = pixels[k];
-  //       if (pixel.pixelNumber == newPixel.pixelNumber) {
-  //         console.log("Pixel is already taken", pixel.pixelNumber);
-  //         return res.status(400).json({ message: "Pixel is already taken" });
-  //       }
-  //     }
-  //   }
-  // }
+  for (let i = 0; i < logos.length; i++) {
+    const logo = logos[i];
+    for (let j = 0; j < logo.pixels.length; j++) {
+      const pixel = logo.pixels[j];
+      for (let k = 0; k < pixels.length; k++) {
+        const newPixel = pixels[k];
+        if (pixel.pixelNumber == newPixel.pixelNumber) {
+          console.log("Pixel is already taken", pixel.pixelNumber);
+          return res.status(400).json({ message: "Pixel is already taken" });
+        }
+      }
+    }
+  }
+
   const price = rows * cols * 20;
   //* Create a new logo document with isVerified initially false
   const logo = await Logo.create({
@@ -90,6 +91,7 @@ export const addLogo = async (req, res, next) => {
     return res.status(201).json({
       message: "Logo added successfully. Proceed to payment.",
       paymentLink,
+      success:true
     });
   } catch (error) {
     console.error("Payment error:", error.response?.data || error.message);
@@ -143,16 +145,14 @@ export const addUnpaidLogo = async (req, res, next) => {
     return res.status(400).json({ message: "Failed to add logo" });
   }
   //* return the logo
-  return res.status(201).json({ message: "Logo added successfully", logo });
+  return res.status(201).json({ message: "Logo added successfully", logo , success: true  });
 };
 
 //&====================== UPDATE LOGO ======================&//
 export const updateLogo = async (req, res, next) => {
   const { id } = req.params;
-  console.log(id);
   const {role} = req.authUser;
   const { username, email, title, description, rows, cols, logoLink, selectedCells } = req.body;
-  console.log(selectedCells);
 
   //* check if the user is not an admin
   if (role !== systemRoles.ADMIN) {
@@ -255,6 +255,11 @@ export const getLogos = async (req, res, next) => {
 //&====================== DELETE LOGO ======================&//
 export const deleteLogo = async (req, res, next) => {
   const { id } = req.params;
+  const {role} = req.authUser;
+  //* check if the user is not an admin
+  if (role !== systemRoles.ADMIN) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
   const logo = await Logo.findByIdAndDelete(id);
   if (!logo) {
     return res.status(404).json({ message: "Logo not found" });
