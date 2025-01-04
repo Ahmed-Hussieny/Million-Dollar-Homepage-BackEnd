@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose the app's port (e.g., 5000)
-EXPOSE 5000
+EXPOSE 3000
 
 # Run the application in development mode
-CMD ["npm", "run", "dev"]
+CMD ["node", "index.js"]

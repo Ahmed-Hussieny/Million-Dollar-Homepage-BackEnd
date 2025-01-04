@@ -8,8 +8,11 @@ export const initiateApp = async ({app, express}) => {
     connection_DB();
     app.use('/logo', Routers.logoRouter);
     app.use('/auth', Routers.authRouter);
+    app.use('/pixel', Routers.pixelRouter);
+    // static 
+    app.use('/uploads',express.static('uploads'));
+    app.use('/gridImage', express.static('gridImage'));
     app.use(globalResponce);
-
     app.use('*', (req, res) => {
         return res.status(404).json({message: 'Route not found'});
     });
